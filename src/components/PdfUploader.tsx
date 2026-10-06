@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { Language, UploadedFileItem, DuplicateGroup } from '../types/tender';
 import { translations } from '../i18n/translations';
-import { computeFileHash, inspectPdfFile, generateTestPdf } from '../utils/pdf';
+import { computeFileHash, inspectPdfFile, generateTestPdf, isPdfFile } from '../utils/pdf';
 
 interface PdfUploaderProps {
   language: Language;
