@@ -11,6 +11,29 @@ export async function computeFileHash(file: File): Promise<string> {
 }
 
 /**
+ * Checks whether a file is genuinely a PDF by verifying both mime/extension and magic bytes.
+ */
+export async function isPdfFile(file: File): Promise<boolean> {
+  const nameLower = file.name.toLowerCase();
+  const isPdfExtension = nameLower.endsWith('.pdf');
+  const isPdfMime = file.type === 'application/pdf' || file.type === '';
+
+  if (!isPdfExtension && !isPdfMime) {
+    return false;
+  }
+
+  try {
+    const slice = file.slice(0, 5);
+    const buffer = await slice.arrayBuffer();
+    const headerBytes = new Uint8Array(buffer);
+    const headerStr = String.fromCharCode(...headerBytes);
+    return headerStr.startsWith('%PDF');
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Inspects a PDF in the browser to extract its page count safely.
  * Handles encrypted/password-protected or damaged files without crashing.
  */

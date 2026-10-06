@@ -56,19 +56,44 @@ export const RequirementsLoader: React.FC<RequirementsLoaderProps> = ({
         throw new Error("Requirements list must be a non-empty array");
       }
 
-      // Check items
-      for (const req of requirements) {
-        if (!req.id || typeof req.order !== 'number' || !req.title_en) {
-          throw new Error(`Invalid requirement item (must have id, order, title_en): ${JSON.stringify(req)}`);
+      // Check items and normalize
+      const normalizedRequirements = requirements.map((req: any, index: number) => {
+        if (!req || typeof req !== 'object') {
+          throw new Error(`Invalid requirement at index ${index}`);
         }
-      }
+        if (!req.id) {
+          throw new Error(`Requirement item #${index + 1} is missing an 'id'`);
+        }
+        const numOrder = Number(req.order);
+        if (isNaN(numOrder)) {
+          throw new Error(`Requirement item #${req.id} has an invalid non-numeric 'order'`);
+        }
+        if (!req.title_en) {
+          throw new Error(`Requirement item #${req.id} is missing 'title_en'`);
+        }
 
-      // Sort requirements by order
-      const sortedRequirements = [...requirements].sort((a, b) => a.order - b.order);
+        return {
+          id: String(req.id),
+          order: numOrder,
+          title_en: String(req.title_en),
+          title_bn: String(req.title_bn || req.title_en),
+          mandatory: Boolean(req.mandatory),
+          has_expiry: Boolean(req.has_expiry),
+        };
+      });
+
+      // Sort requirements numerically by order
+      normalizedRequirements.sort((a: any, b: any) => a.order - b.order);
 
       onRequirementsLoaded({
-        tender,
-        requirements: sortedRequirements,
+        tender: {
+          tender_id: String(tender.tender_id),
+          title: String(tender.title),
+          procuring_entity: String(tender.procuring_entity || ''),
+          bidder: String(tender.bidder || ''),
+          submission_deadline: String(tender.submission_deadline),
+        },
+        requirements: normalizedRequirements,
       });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : t.invalidJsonError;

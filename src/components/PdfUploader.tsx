@@ -51,40 +51,60 @@ export const PdfUploader: React.FC<PdfUploaderProps> = ({
     setUploadError(null);
     if (selectedFiles.length === 0) return;
 
-    // Check count limit
-    if (files.length + selectedFiles.length > MAX_FILES) {
-      setUploadError(
-        `${t.maxFilesExceeded} (Currently ${files.length}, tried adding ${selectedFiles.length}, limit is ${MAX_FILES})`
-      );
-      return;
-    }
-
-    // Check non-PDF files
-    const nonPdfs = selectedFiles.filter(
-      (f) => !f.name.toLowerCase().endsWith('.pdf') && f.type !== 'application/pdf'
-    );
-    if (nonPdfs.length > 0) {
-      setUploadError(
-        `${t.nonPdfRejected} [${nonPdfs.map((f) => f.name).join(', ')}]`
-      );
-      return;
-    }
-
-    // Check total size
-    const newTotalSize = totalSizeBytes + selectedFiles.reduce((acc, f) => acc + f.size, 0);
-    if (newTotalSize > MAX_TOTAL_SIZE_BYTES) {
-      setUploadError(
-        `${t.maxSizeExceeded} (Current + new files = ${formatFileSize(newTotalSize)}, limit is 50 MB)`
-      );
-      return;
-    }
-
     setIsProcessing(true);
 
     try {
-      const processedItems: UploadedFileItem[] = [];
+      const validFiles: File[] = [];
+      const rejectedNonPdfs: string[] = [];
+      const skippedDueToLimit: string[] = [];
+
+      let runningCount = files.length;
+      let runningSize = totalSizeBytes;
 
       for (const file of selectedFiles) {
+        // Check actual PDF type and magic bytes
+        const isPdf = await isPdfFile(file);
+        if (!isPdf) {
+          rejectedNonPdfs.push(file.name);
+          continue;
+        }
+
+        // Check file count limit
+        if (runningCount >= MAX_FILES) {
+          skippedDueToLimit.push(`${file.name} (exceeded 30 files limit)`);
+          continue;
+        }
+
+        // Check size limit
+        if (runningSize + file.size > MAX_TOTAL_SIZE_BYTES) {
+          skippedDueToLimit.push(`${file.name} (would exceed 50 MB total limit)`);
+          continue;
+        }
+
+        validFiles.push(file);
+        runningCount++;
+        runningSize += file.size;
+      }
+
+      // Construct user-friendly feedback if any files were rejected or skipped
+      const notices: string[] = [];
+      if (rejectedNonPdfs.length > 0) {
+        notices.push(
+          `${t.nonPdfRejected}: [${rejectedNonPdfs.join(', ')}]`
+        );
+      }
+      if (skippedDueToLimit.length > 0) {
+        notices.push(
+          `Some files could not be added due to limits: [${skippedDueToLimit.join(', ')}]`
+        );
+      }
+      if (notices.length > 0) {
+        setUploadError(notices.join(' • '));
+      }
+
+      // Process valid PDFs
+      const processedItems: UploadedFileItem[] = [];
+      for (const file of validFiles) {
         const fileId = `file-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
         // Calculate cryptographic hash
@@ -106,7 +126,9 @@ export const PdfUploader: React.FC<PdfUploaderProps> = ({
         });
       }
 
-      onFilesAdded(processedItems);
+      if (processedItems.length > 0) {
+        onFilesAdded(processedItems);
+      }
     } catch (err: unknown) {
       setUploadError('Unexpected error inspecting PDF documents');
       console.error(err);
