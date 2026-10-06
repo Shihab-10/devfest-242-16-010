@@ -54,16 +54,21 @@ export const MatchingChecklist: React.FC<MatchingChecklistProps> = ({
 
   // Inverted map: fileId -> reqId (which file is currently assigned to which requirement)
   const fileToReqMap = new Map<string, string>();
-  for (const [reqId, fileId] of Object.entries(matches)) {
-    if (fileId) {
-      fileToReqMap.set(fileId, reqId);
+  for (const [reqId, matchVal] of Object.entries(matches)) {
+    if (matchVal) {
+      fileToReqMap.set(matchVal, reqId);
+      const f = uploadedFiles.find((x) => x.id === matchVal || x.name === matchVal || x.sha256 === matchVal);
+      if (f) {
+        fileToReqMap.set(f.id, reqId);
+        fileToReqMap.set(f.name, reqId);
+      }
     }
   }
 
   // Set of matched file hashes
   const matchedHashes = new Set<string>();
-  for (const [, fileId] of Object.entries(matches)) {
-    const file = uploadedFiles.find((f) => f.id === fileId);
+  for (const [, matchVal] of Object.entries(matches)) {
+    const file = uploadedFiles.find((f) => f.id === matchVal || f.name === matchVal || f.sha256 === matchVal);
     if (file && file.sha256) {
       matchedHashes.add(file.sha256);
     }
@@ -129,20 +134,54 @@ export const MatchingChecklist: React.FC<MatchingChecklistProps> = ({
   const matchedItemsCount = evaluatedList.filter((e) => e.matchedFile !== null).length;
 
   const handleAutoMatchSuggestions = () => {
+    const usedIds = new Set<string>();
+    const usedHashes = new Set<string>();
+
+    for (const [, matchVal] of Object.entries(matches)) {
+      if (!matchVal) continue;
+      const f = uploadedFiles.find((x) => x.id === matchVal || x.name === matchVal || x.sha256 === matchVal);
+      if (f) {
+        usedIds.add(f.id);
+        if (f.sha256) usedHashes.add(f.sha256);
+      }
+    }
+
     for (const item of evaluatedList) {
       if (item.matchedFile) continue;
-      const reqTitle = (item.requirement.title_en || '').toLowerCase();
-      const words = reqTitle.replace(/[^a-z0-9]/g, ' ').split(/\s+/).filter((w) => w.length > 2);
+      const req = item.requirement;
+      const order2 = String(req.order).padStart(2, '0');
+      const order1 = String(req.order);
 
       const candidate = uploadedFiles.find((f) => {
-        if (fileToReqMap.has(f.id)) return false;
-        if (matchedHashes.has(f.sha256)) return false;
-        const fname = f.name.toLowerCase();
-        return words.some((word) => fname.includes(word));
+        if (usedIds.has(f.id)) return false;
+        if (f.sha256 && usedHashes.has(f.sha256)) return false;
+
+        const nameLower = f.name.toLowerCase();
+
+        // Match by standard order prefix (e.g., "01_", "1_", "01-", "1-")
+        if (
+          nameLower.startsWith(`${order2}_`) ||
+          nameLower.startsWith(`${order1}_`) ||
+          nameLower.startsWith(`${order2}-`) ||
+          nameLower.startsWith(`${order1}-`)
+        ) {
+          return true;
+        }
+
+        // Precise keyword matching per requirement
+        if (req.order === 1 && (nameLower.includes('trade_license') || nameLower.includes('trade license'))) return true;
+        if (req.order === 2 && (nameLower.includes('tin_certificate') || nameLower.includes('tin') || nameLower.includes('tax_return'))) return true;
+        if (req.order === 3 && (nameLower.includes('vat_bin') || nameLower.includes('vat') || nameLower.includes('bin'))) return true;
+        if (req.order === 4 && (nameLower.includes('tender_security') || nameLower.includes('bank_guarantee') || nameLower.includes('security'))) return true;
+        if (req.order === 5 && (nameLower.includes('financial_balance') || nameLower.includes('balance_sheet') || nameLower.includes('financial'))) return true;
+
+        return false;
       });
 
       if (candidate) {
-        onMatchChange(item.requirement.id, candidate.id);
+        usedIds.add(candidate.id);
+        if (candidate.sha256) usedHashes.add(candidate.sha256);
+        onMatchChange(req.id, candidate.id);
       }
     }
   };

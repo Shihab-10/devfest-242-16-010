@@ -309,6 +309,77 @@ async function runEdgeCaseTests() {
   const generatedDoc = await PDFDocument.load(await genResult.blob.arrayBuffer());
   assert(generatedDoc.getPageCount() === 4, 'Generated PDF has exactly 4 pages in master document');
 
+  // --- EDGE CASE 21: 5 Test PDFs exact mapping and page counts (1, 2, 1, 2, 3) ---
+  console.log('\n--- Edge Case 21: Contest 5 Test PDFs exact mapping & isolation ---');
+  const testPdfs = [
+    createMockFile('f-01', '01_Trade_License_TEST.pdf', 'sha-01', 1),
+    createMockFile('f-02', '02_TIN_Certificate_TEST.pdf', 'sha-02', 2),
+    createMockFile('f-03', '03_VAT_BIN_Certificate_TEST.pdf', 'sha-03', 1),
+    createMockFile('f-04', '04_Tender_Security_TEST.pdf', 'sha-04', 2),
+    createMockFile('f-05', '05_Financial_Balance_Sheets_TEST.pdf', 'sha-05', 3),
+    createMockFile('f-problem', 'AIDevFest-ViveCoding_ProblemStatement.pdf', 'sha-problem', 5),
+  ];
+
+  // Match strictly the 5 test files to req-01..05
+  const exactMatches: Record<string, string> = {
+    'req-01': 'f-01',
+    'req-02': 'f-02',
+    'req-03': 'f-03',
+    'req-04': 'f-04',
+    'req-05': 'f-05',
+  };
+  const testExpiries: Record<string, string> = {
+    'req-01': '2026-12-31',
+    'req-04': '2026-12-31',
+  };
+
+  const evalTestMapping = evaluateAllRequirements(
+    sampleTender.requirements,
+    exactMatches,
+    testExpiries,
+    testPdfs,
+    sampleTender.tender.submission_deadline
+  );
+
+  // 1. Verify req-01 to req-05 are matched with exact page counts
+  const r1 = evalTestMapping.evaluatedList.find((e) => e.requirement.id === 'req-01');
+  assert(r1?.matchedFile?.name === '01_Trade_License_TEST.pdf', 'req-01 matches 01_Trade_License_TEST.pdf');
+  assert(r1?.matchedFile?.pageCount === 1, 'req-01 page count is 1');
+  assert(r1?.status === 'OK', 'req-01 status is OK');
+
+  const r2 = evalTestMapping.evaluatedList.find((e) => e.requirement.id === 'req-02');
+  assert(r2?.matchedFile?.name === '02_TIN_Certificate_TEST.pdf', 'req-02 matches 02_TIN_Certificate_TEST.pdf');
+  assert(r2?.matchedFile?.pageCount === 2, 'req-02 page count is 2');
+  assert(r2?.status === 'OK', 'req-02 status is OK');
+
+  const r3 = evalTestMapping.evaluatedList.find((e) => e.requirement.id === 'req-03');
+  assert(r3?.matchedFile?.name === '03_VAT_BIN_Certificate_TEST.pdf', 'req-03 matches 03_VAT_BIN_Certificate_TEST.pdf');
+  assert(r3?.matchedFile?.pageCount === 1, 'req-03 page count is 1');
+  assert(r3?.status === 'OK', 'req-03 status is OK');
+
+  const r4 = evalTestMapping.evaluatedList.find((e) => e.requirement.id === 'req-04');
+  assert(r4?.matchedFile?.name === '04_Tender_Security_TEST.pdf', 'req-04 matches 04_Tender_Security_TEST.pdf');
+  assert(r4?.matchedFile?.pageCount === 2, 'req-04 page count is 2');
+  assert(r4?.status === 'OK', 'req-04 status is OK');
+
+  const r5 = evalTestMapping.evaluatedList.find((e) => e.requirement.id === 'req-05');
+  assert(r5?.matchedFile?.name === '05_Financial_Balance_Sheets_TEST.pdf', 'req-05 matches 05_Financial_Balance_Sheets_TEST.pdf');
+  assert(r5?.matchedFile?.pageCount === 3, 'req-05 page count is 3');
+  assert(r5?.status === 'OK', 'req-05 status is OK');
+
+  // 2. Verify optional req-06 and req-07 remain Not provided
+  const r6 = evalTestMapping.evaluatedList.find((e) => e.requirement.id === 'req-06');
+  assert(r6?.matchedFile === null, 'req-06 has no matched file');
+  assert(r6?.status === 'Not provided', 'req-06 status is Not provided');
+  assert(r6?.isBlocking === false, 'req-06 is non-blocking');
+
+  const r7 = evalTestMapping.evaluatedList.find((e) => e.requirement.id === 'req-07');
+  assert(r7?.matchedFile === null, 'req-07 has no matched file');
+  assert(r7?.status === 'Not provided', 'req-07 status is Not provided');
+  assert(r7?.isBlocking === false, 'req-07 is non-blocking');
+
+  assert(evalTestMapping.isPackageReady === true, 'All 5 mandatory ready and package is ready to generate');
+
   console.log(`\n================================================================`);
   console.log(`ALL TESTS PASSED! (${passCount} passed, ${failCount} failed)`);
   console.log(`================================================================\n`);

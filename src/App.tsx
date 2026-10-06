@@ -102,12 +102,16 @@ export const App: React.FC = () => {
   };
 
   const handleFileRemoved = (fileId: string) => {
+    const removedFile = uploadedFiles.find((f) => f.id === fileId);
     setUploadedFiles((prev) => prev.filter((f) => f.id !== fileId));
-    // Clear any matches containing this fileId
+    // Clear any matches containing this fileId (or its name / sha256)
     setMatches((prev) => {
       const next: Record<string, string> = {};
       for (const [reqId, fId] of Object.entries(prev)) {
-        if (fId !== fileId) {
+        if (
+          fId !== fileId &&
+          (!removedFile || (fId !== removedFile.name && fId !== removedFile.sha256))
+        ) {
           next[reqId] = fId;
         }
       }
@@ -115,20 +119,35 @@ export const App: React.FC = () => {
     });
   };
 
-  // Matching handler (enforcing 1-to-1)
+  // Matching handler (strictly enforcing 1-to-1)
   const handleMatchChange = (requirementId: string, fileId: string | null) => {
     setMatches((prev) => {
       const next = { ...prev };
       if (!fileId) {
         delete next[requirementId];
       } else {
-        // If fileId was matched to another requirement, unmatch it from there first
+        // Resolve target file from uploadedFiles
+        const targetFile = uploadedFiles.find(
+          (f) => f.id === fileId || f.name === fileId || f.sha256 === fileId
+        );
+        const resolvedId = targetFile ? targetFile.id : fileId;
+
+        // If this file (or an exact binary duplicate) was matched to another requirement, unmatch it from there
         for (const [rId, fId] of Object.entries(next)) {
-          if (fId === fileId && rId !== requirementId) {
-            delete next[rId];
+          if (rId !== requirementId) {
+            const existingFile = uploadedFiles.find(
+              (f) => f.id === fId || f.name === fId || f.sha256 === fId
+            );
+            if (
+              fId === resolvedId ||
+              (targetFile && existingFile && targetFile.id === existingFile.id) ||
+              (targetFile?.sha256 && existingFile?.sha256 && targetFile.sha256 === existingFile.sha256)
+            ) {
+              delete next[rId];
+            }
           }
         }
-        next[requirementId] = fileId;
+        next[requirementId] = resolvedId;
       }
       return next;
     });

@@ -129,7 +129,17 @@ export function evaluateAllRequirements(
   isPackageReady: boolean;
   duplicateConflictWarnings: string[];
 } {
-  const fileMap = new Map<string, UploadedFileItem>(files.map(f => [f.id, f]));
+  const fileById = new Map<string, UploadedFileItem>();
+  const fileByName = new Map<string, UploadedFileItem>();
+  const fileByHash = new Map<string, UploadedFileItem>();
+
+  for (const f of files) {
+    fileById.set(f.id, f);
+    fileByName.set(f.name, f);
+    if (f.sha256) {
+      fileByHash.set(f.sha256, f);
+    }
+  }
   const sortedReqs = [...requirements].sort((a, b) => a.order - b.order);
 
   const evaluatedList: EvaluatedRequirement[] = [];
@@ -140,8 +150,10 @@ export function evaluateAllRequirements(
   const matchedHashes = new Map<string, { reqId: string; fileName: string; reqTitle: string }>();
 
   for (const req of sortedReqs) {
-    const fileId = matches[req.id];
-    const file = fileId ? fileMap.get(fileId) || null : null;
+    const matchVal = matches[req.id];
+    const file = matchVal
+      ? fileById.get(matchVal) || fileByName.get(matchVal) || fileByHash.get(matchVal) || null
+      : null;
     const expiry = expiryDates[req.id] || '';
 
     const evaluation = evaluateRequirement(req, file, expiry, submissionDeadline);
