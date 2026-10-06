@@ -222,6 +222,7 @@ export const App: React.FC = () => {
         {requirementsData && (
           <MatchingChecklist
             language={language}
+            tender={requirementsData.tender}
             evaluatedList={evaluatedList}
             uploadedFiles={uploadedFiles}
             duplicateGroups={duplicateGroups}

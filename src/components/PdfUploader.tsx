@@ -190,7 +190,38 @@ export const PdfUploader: React.FC<PdfUploaderProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Dual Resource Meters (File Count & Total Size) */}
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="w-28 sm:w-36 space-y-1">
+            <div className="flex justify-between text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+              <span>{t.fileCountMeter}</span>
+              <span>{files.length}/{MAX_FILES}</span>
+            </div>
+            <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+              <div
+                className={`h-1.5 rounded-full transition-all ${
+                  files.length >= MAX_FILES ? 'bg-rose-500' : files.length > 20 ? 'bg-amber-500' : 'bg-indigo-600'
+                }`}
+                style={{ width: `${Math.min(100, (files.length / MAX_FILES) * 100)}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="w-28 sm:w-36 space-y-1">
+            <div className="flex justify-between text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+              <span>{t.fileSizeMeter}</span>
+              <span>{formatFileSize(totalSizeBytes)}</span>
+            </div>
+            <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+              <div
+                className={`h-1.5 rounded-full transition-all ${
+                  totalSizeBytes >= MAX_TOTAL_SIZE_BYTES ? 'bg-rose-500' : totalSizeBytes > 40 * 1024 * 1024 ? 'bg-amber-500' : 'bg-emerald-600'
+                }`}
+                style={{ width: `${Math.min(100, (totalSizeBytes / MAX_TOTAL_SIZE_BYTES) * 100)}%` }}
+              />
+            </div>
+          </div>
+
           <button
             type="button"
             onClick={handleGenerateSampleFiles}
@@ -375,6 +406,21 @@ export const PdfUploader: React.FC<PdfUploaderProps> = ({
                         </span>
                       )}
                     </div>
+
+                    {/* Duplicate Detailed Explanation Callout */}
+                    {isDuplicate && (
+                      <div className="mt-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-[11px] text-amber-900 dark:text-amber-200 space-y-0.5">
+                        <div className="flex items-center gap-1 font-bold text-amber-800 dark:text-amber-300">
+                          <AlertCircle className="w-3 h-3 text-amber-600 dark:text-amber-400 shrink-0" />
+                          <span>
+                            {language === 'en' ? 'Duplicate Content Alert' : 'ডুপ্লিকেট কন্টেন্ট সতর্কতা'}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-amber-800 dark:text-amber-300 leading-tight">
+                          {t.duplicateExplanation}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 );
               })}

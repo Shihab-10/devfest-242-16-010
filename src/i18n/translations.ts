@@ -110,6 +110,21 @@ export interface TranslationStrings {
   compilationSuccess: string;
   compilationError: string;
 
+  // Status concise messages
+  statusMsgMissing: string;
+  statusMsgExpiryNeeded: string;
+  statusMsgExpired: string;
+  statusMsgOk: string;
+  statusMsgNotProvided: string;
+
+  // Tools & Actions
+  exportCsvBtn: string;
+  suggestMatchesBtn: string;
+  suggestMatchesTooltip: string;
+  duplicateExplanation: string;
+  fileCountMeter: string;
+  fileSizeMeter: string;
+
   // Footer & participant
   participantName: string;
   participantReg: string;
@@ -229,6 +244,21 @@ export const translations: Record<'en' | 'bn', TranslationStrings> = {
     compilationSuccess: "Tender document package compiled successfully!",
     compilationError: "Failed to compile tender document package.",
 
+    // Status concise messages
+    statusMsgMissing: "Required document has not been matched.",
+    statusMsgExpiryNeeded: "Enter the expiry date to continue.",
+    statusMsgExpired: "Expiry date is before the tender submission deadline.",
+    statusMsgOk: "Document is valid.",
+    statusMsgNotProvided: "Optional document omitted.",
+
+    // Tools & Actions
+    exportCsvBtn: "Export CSV Report",
+    suggestMatchesBtn: "Auto-Match Suggestions",
+    suggestMatchesTooltip: "Auto-match unassigned files based on filename similarity",
+    duplicateExplanation: "These files share identical binary contents (SHA-256) and cannot be used to satisfy separate requirements.",
+    fileCountMeter: "Files Uploaded",
+    fileSizeMeter: "Total Size",
+
     // Footer & participant
     participantName: "Participant: Md.Shehabaul Alam",
     participantReg: "Reg: 242-16-010",
@@ -346,6 +376,21 @@ export const translations: Record<'en' | 'bn', TranslationStrings> = {
     downloadAgainBtn: "পুনরায় ডাউনলোড করুন",
     compilationSuccess: "দরপত্র নথি প্যাকেজ সফলভাবে সংকলিত হয়েছে!",
     compilationError: "দরপত্র নথি প্যাকেজ সংকলনে ত্রুটি হয়েছে।",
+
+    // Status concise messages
+    statusMsgMissing: "বাধ্যতামূলক নথিটি এখনও সংযুক্ত করা হয়নি।",
+    statusMsgExpiryNeeded: "চালিয়ে যেতে মেয়াদ উত্তীর্ণের তারিখ প্রবেশ করান।",
+    statusMsgExpired: "মেয়াদ উত্তীর্ণের তারিখ দরপত্র দাখিলের শেষ সময়ের পূর্বে।",
+    statusMsgOk: "নথিটি বৈধ ও যাচাইকৃত।",
+    statusMsgNotProvided: "ঐচ্ছিক নথি প্রদান করা হয়নি।",
+
+    // Tools & Actions
+    exportCsvBtn: "সিএসভি রিপোর্ট ডাউনলোড",
+    suggestMatchesBtn: "স্বয়ংক্রিয় মিলকরণ প্রস্তাব",
+    suggestMatchesTooltip: "ফাইলের নামের সাদৃশ্যের ভিত্তিতে ফাইল স্বয়ংক্রিয়ভাবে সংযুক্ত করুন",
+    duplicateExplanation: "এই ফাইলগুলোর বাইনারি কন্টেন্ট হুবহু একই (SHA-256) এবং এগুলোকে পৃথক পৃথক চাহিদায় ব্যবহার করা যাবে না।",
+    fileCountMeter: "আপলোডকৃত ফাইল",
+    fileSizeMeter: "মোট আকার",
 
     // Footer & participant
     participantName: "অংশগ্রহণকারী: মো. শেহাবাউল আলম",

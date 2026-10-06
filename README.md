@@ -67,6 +67,13 @@ All document processing happens **100% locally in the browser**. No files or met
    - The "Generate Tender Package" control is strictly disabled when any blocking issues or duplicate conflicts exist.
    - Displays an interactive breakdown of all blocking problems preventing package compilation.
 
+9. **Phase 2 & 3 Polish & Productivity Enhancements**
+   - **Compliance CSV Report Export:** One-click export of an audit-ready CSV report formatted with UTF-8 BOM for Microsoft Excel compatibility, documenting requirement compliance, matched filenames, page counts, expiry validity, and status explanations.
+   - **Smart Auto-Match Suggestions:** Heuristic assistant that suggests matching unassigned PDFs to checklist items based on filename and title similarity.
+   - **Real-Time Resource Meters:** Visual usage gauges for the 30-file count limit and 50 MB total upload ceiling with dynamic color transitions.
+   - **Duplicate Explanation Callouts:** Contextual notifications explaining why files sharing identical SHA-256 hashes cannot be used to satisfy separate requirements.
+   - **Comprehensive Automated Test Suite:** 34 automated verification tests (`scripts/test-edge-cases.ts`) covering all 20 edge cases and PDF generation requirements.
+
 ---
 
 ## 🛠️ Tech Stack
@@ -90,7 +97,7 @@ cd devfest-242-16-010
 # Install dependencies
 npm install
 
-# Run the 20 Edge Cases + PDF Package Generator automated test suite
+# Run the 20 Edge Cases + PDF Package Generator automated test suite (34 checks)
 npx tsx scripts/test-edge-cases.ts
 
 # Start the Vite development server
