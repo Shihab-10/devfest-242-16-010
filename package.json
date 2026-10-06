@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "test": "npx tsx scripts/test-edge-cases.ts",
     "preview": "vite preview"
   },
   "dependencies": {

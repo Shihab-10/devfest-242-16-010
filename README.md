@@ -98,7 +98,8 @@ cd devfest-242-16-010
 npm install
 
 # Run the 20 Edge Cases + PDF Package Generator automated test suite (34 checks)
-npx tsx scripts/test-edge-cases.ts
+npm test
+# (or: npx tsx scripts/test-edge-cases.ts)
 
 # Start the Vite development server
 npm run dev
