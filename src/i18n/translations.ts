@@ -102,6 +102,13 @@ export interface TranslationStrings {
   summaryTitle: string;
   readyDocuments: string;
   blockingIssues: string;
+  duplicateFiles: string;
+  optionalOmitted: string;
+  compilingPackage: string;
+  downloadPackageBtn: string;
+  downloadAgainBtn: string;
+  compilationSuccess: string;
+  compilationError: string;
 
   // Footer & participant
   participantName: string;
@@ -211,9 +218,16 @@ export const translations: Record<'en' | 'bn', TranslationStrings> = {
     blockingReasonExpiryNeeded: "Expiry date is required for this matched document",
     blockingReasonExpired: "Document expiry date is earlier than the tender submission deadline",
     blockingReasonDuplicate: "File is an exact duplicate of another matched document",
-    summaryTitle: "Package Summary",
+    summaryTitle: "Package Summary & Compilation",
     readyDocuments: "Compliant Documents",
     blockingIssues: "Blocking Issues",
+    duplicateFiles: "Duplicate Files",
+    optionalOmitted: "Optional Omitted",
+    compilingPackage: "Compiling Tender Document Package...",
+    downloadPackageBtn: "Download Tender Package",
+    downloadAgainBtn: "Download Again",
+    compilationSuccess: "Tender document package compiled successfully!",
+    compilationError: "Failed to compile tender document package.",
 
     // Footer & participant
     participantName: "Participant: Md.Shehabaul Alam",
@@ -322,9 +336,16 @@ export const translations: Record<'en' | 'bn', TranslationStrings> = {
     blockingReasonExpiryNeeded: "সংযুক্ত নথির জন্য মেয়াদোত্তীর্ণের তারিখ প্রদান আবশ্যক",
     blockingReasonExpired: "নথির মেয়াদ দরপত্র দাখিলের শেষ তারিখের পূর্বে উত্তীর্ণ হয়ে গেছে",
     blockingReasonDuplicate: "ফাইলটি অপর একটি সংযুক্ত নথির হুবহু ডুপ্লিকেট",
-    summaryTitle: "প্যাকেজ সারসংক্ষেপ",
+    summaryTitle: "প্যাকেজ সারসংক্ষেপ ও সংকলন",
     readyDocuments: "যথাযথ নথি",
     blockingIssues: "অবরুদ্ধকারী সমস্যা",
+    duplicateFiles: "ডুপ্লিকেট ফাইল",
+    optionalOmitted: "অনুপস্থিত ঐচ্ছিক নথি",
+    compilingPackage: "দরপত্র নথি প্যাকেজ প্রস্তুত করা হচ্ছে...",
+    downloadPackageBtn: "দরপত্র প্যাকেজ ডাউনলোড করুন",
+    downloadAgainBtn: "পুনরায় ডাউনলোড করুন",
+    compilationSuccess: "দরপত্র নথি প্যাকেজ সফলভাবে সংকলিত হয়েছে!",
+    compilationError: "দরপত্র নথি প্যাকেজ সংকলনে ত্রুটি হয়েছে।",
 
     // Footer & participant
     participantName: "অংশগ্রহণকারী: মো. শেহাবাউল আলম",

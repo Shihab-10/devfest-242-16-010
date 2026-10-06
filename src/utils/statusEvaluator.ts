@@ -148,16 +148,16 @@ export function evaluateAllRequirements(
     evaluatedList.push(evaluation);
 
     if (evaluation.isBlocking) {
-      blockingIssues.push(`[#${req.order} ${req.title_en}]: ${evaluation.status} - ${evaluation.statusReason}`);
+      blockingIssues.push(`[#${req.order} ${req.title_en}]: ${evaluation.status} — ${evaluation.statusReason}`);
     }
 
     // Check duplicate content matched across requirements
     if (file && file.sha256) {
       const prevMatched = matchedHashes.get(file.sha256);
       if (prevMatched && prevMatched.reqId !== req.id) {
-        const warning = `Duplicate file detected: "${file.name}" matched to #${req.order} has identical SHA-256 binary hash as "${prevMatched.fileName}" matched to #${prevMatched.reqTitle}.`;
+        const warning = `Duplicate content detected: "${file.name}" matched to #${req.order} shares identical SHA-256 binary hash with "${prevMatched.fileName}" matched to #${prevMatched.reqTitle}.`;
         duplicateConflictWarnings.push(warning);
-        blockingIssues.push(`Duplicate binary conflict between requirement #${req.order} and #${prevMatched.reqTitle}`);
+        blockingIssues.push(`Duplicate file conflict: Identical binary PDF used for #${req.order} and #${prevMatched.reqTitle}`);
       } else {
         matchedHashes.set(file.sha256, {
           reqId: req.id,

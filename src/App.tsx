@@ -242,9 +242,7 @@ export const App: React.FC = () => {
             evaluatedList={evaluatedList}
             blockingIssues={blockingIssues}
             isPackageReady={isPackageReady}
-            onGeneratePackage={() => {
-              console.log('Package compiled successfully!');
-            }}
+            duplicateCount={duplicateGroups.size}
           />
         )}
       </main>

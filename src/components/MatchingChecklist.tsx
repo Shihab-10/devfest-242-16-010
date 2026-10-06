@@ -259,20 +259,27 @@ export const MatchingChecklist: React.FC<MatchingChecklistProps> = ({
                           const isAssignedToOther =
                             fileToReqMap.has(file.id) && fileToReqMap.get(file.id) !== req.id;
                           const otherReqId = fileToReqMap.get(file.id);
+                          const otherReq = evaluatedList.find((e) => e.requirement.id === otherReqId)?.requirement;
                           const isDupGroup = duplicateGroups.has(file.sha256);
+
+                          // Check if another duplicate of this file is already matched elsewhere
+                          const isDuplicateAlreadyMatched =
+                            isDupGroup &&
+                            matchedHashes.has(file.sha256) &&
+                            matchedFile?.sha256 !== file.sha256;
 
                           let label = `${file.name} (${file.pageCount ?? '?'} pgs)`;
                           if (isAssignedToOther) {
-                            label += ` — [Matched to #${otherReqId}]`;
-                          } else if (isDupGroup && matchedHashes.has(file.sha256) && !matchedFile) {
-                            label += ` — [Duplicate file]`;
+                            label += ` — [Reassign from #${otherReq?.order ?? otherReqId}]`;
+                          } else if (isDuplicateAlreadyMatched) {
+                            label += ` — [Duplicate of already matched file]`;
                           }
 
                           return (
                             <option
                               key={file.id}
                               value={file.id}
-                              disabled={isAssignedToOther}
+                              disabled={isDuplicateAlreadyMatched}
                             >
                               {label}
                             </option>
