@@ -56,7 +56,14 @@ All document processing happens **100% locally in the browser**. No files or met
      - 🟢 **OK:** Matched and compliant; if expiry applies, date is on or after the deadline (non-blocking).
    - Recalculates immediately on any file or requirement change.
 
-7. **Blocked Package Protection**
+7. **Browser-Side PDF Package Generator (`pdf-lib`)**
+   - **Page 1 Cover Page:** Generated in professional English with tender details (Tender ID, Title, Procuring Entity, Bidder, Deadline, Creation Date) and an ordered table of all included documents.
+   - **Requirement-Driven Page Order:** Matched PDFs are appended in strict numerical order of requirement `order` (skipping omitted optional items).
+   - **Page X of Y Running Footers:** Every page (including Cover Page) receives an official `<tender_id> | Page X of Y` footer with a subtle protective background band to prevent obscuring content.
+   - **Instant Browser Download:** Downloads directly as `<tender_id>_Package.pdf` via temporary object URL without any server or backend dependencies.
+   - **Live Progress Bar:** Shows real-time compilation steps and percentages.
+
+8. **Blocked Package Protection**
    - The "Generate Tender Package" control is strictly disabled when any blocking issues or duplicate conflicts exist.
    - Displays an interactive breakdown of all blocking problems preventing package compilation.
 
@@ -67,7 +74,7 @@ All document processing happens **100% locally in the browser**. No files or met
 - **Framework:** React 18 with TypeScript
 - **Bundler:** Vite
 - **Styling:** Tailwind CSS with dark mode support
-- **PDF Engine:** `pdf-lib` (browser-side PDF parsing and inspection)
+- **PDF Engine:** `pdf-lib` (browser-side PDF parsing, manipulation, and generation)
 - **Icons:** `lucide-react`
 - **Crypto:** Native Web Crypto API (`crypto.subtle.digest`)
 
@@ -83,8 +90,8 @@ cd devfest-242-16-010
 # Install dependencies
 npm install
 
-# Run the automated verification test suite
-npx tsx scripts/verify-mvp.ts
+# Run the 20 Edge Cases + PDF Package Generator automated test suite
+npx tsx scripts/test-edge-cases.ts
 
 # Start the Vite development server
 npm run dev
